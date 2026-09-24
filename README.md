@@ -43,21 +43,17 @@ The workflow is deliberately tiny: **three taps** — *what's in the glass → w
 
 ## How it thinks
 
-No magic — arithmetic you can argue with. Every axis of the profile is a small formula over your answers, with masking and reinforcement terms. The fun part: **minerality is never asked directly.** It's *computed* — flint, slate, TDN, iodine and salt found in the aroma wheel and free text (regex markers) flow into the axis. A Barolo with "graphite" notes arrives at minerality 7+ on its own.
+No magic — sensory science and enological psychophysics you can argue with:
 
-<details>
-<summary><b>📊 The full math — for those who want the numbers</b></summary>
+<details open>
+<summary><b>📊 The mathematical engine under the hood</b></summary>
 
-Six axes, each 0–10, each a composite of adjacent SAT parameters:
-
-- **Acidity** = base (scale answer) − sugar masking (−0.5…−2.0) + wave shape bonus/penalty (6 acidity profiles).
-- **Tannins** = base + 0.5·(acidity ≥ med+) − sugar smoothing + texture contribution (−1.2…+1.2 across 6 textures).
-- **Body** = base + sugar (0…+2) + alcohol (−0.5…+1.5) + legs/glycerin + new oak.
-- **Fruitiness** = slider − development decay + 0.5·(finish ≥ 8 s).
-- **Minerality** — fully computed: regex markers (flint / slate / TDN / iodine / salt) harvested from the aroma wheel, finish and free text.
-- **Perceived sweetness** = sugar − acidity drying (up to −1.6) − tannin drying (up to −1.2).
-
-Balance (the B in BLIC) follows two house rules: *sweet with a bright fruit anchor is not penalized*; *sweet without an anchor is a imbalance* (fruit slider < 4 at off-dry and above). The engine (`structuralProfile.ts`) keeps the full contribution tail for every axis, so the UI can show *why* the number is the number.
+- **Non-Zero-Sum Aroma Wheel (Weber–Fechner Law):** Conventional tasting apps treat aromas as a zero-sum pie chart — finding secondary oak or tertiary leather unfairly dilutes the fruit score. Our engine uses a logarithmic receptor saturation model: a dominant note (e.g. cherry at level 3 in Sangiovese) secures a solid baseline ($P_F = 7.6/10$), and additional descriptors add cumulative complexity without penalizing the core.
+- **Fruit Freshness Register ($\Phi_{\text{fresh}}$):** Dynamically partitions fruit descriptors into *Primary Fresh* vs. *Tertiary/Dense* (jam, prune, fig), determining whether the wine expresses crunchy youth or mellow maturity.
+- **Shannon Entropy Complexity ($H$):** Measures polyphonic balance across aroma families rather than just counting checkboxes. A mono-varietal citrus bomb gets classified as *Mono-focus*, while multi-family balance achieves *Polyphonic Complexity*.
+- **Parametric Aging Kinetics & The "Dumb Phase":** Computes continuous lifespan ($L$) via preservation forces (tannin shield, acid spine, sugar, alcohol). For collectible age-worthy wines (Barolo, Grand Cru Bordeaux), the spline dynamically carves out the **"Dumb Phase"** (the awkward closed period where primary fruit sleeps before tertiary glory emerges).
+- **Dual-Score & Dual-Contour Radar:** Computes **Score Today** (reflecting youthful austerity discounts) $\longrightarrow$ **Zenith Potential at Peak** ($S_{\text{zenith}}$), accompanied by a dashed future radar overlay showing how acid and tannins will integrate over 8–10 years.
+- **Computed Minerality:** Never asked directly — harvested from flint, slate, iodine, sea salt descriptors, and tasting text regexes.
 
 </details>
 
@@ -91,10 +87,10 @@ npm run icons        # regenerate PWA icons (dependency-free PNG rasterizer)
 
 ## Roadmap
 
-- ⭕ **Balance ring** — a one-look ring gauge for the six-axis profile (in the works)
-- 🔍 Cellar search & filters
-- 🎴 More wine-card themes for the print shop
-- 🌐 UI language parity polish (RU/EN already ship)
+- 🕵️ **Blind Tasting Deduction Engine** — probabilistic varietal matching via vector cosine similarity (in research)
+- ⚔️ **Side-by-Side Cellar Flights** — dual-radar comparison of two bottles
+- 📸 **Social Media Card Generator** — 9:16 Stories / 4:5 Feed canvas export for Instagram & Telegram
+- 🔍 Cellar search & multi-vintage filters
 
 ## 🇷🇺 Русская версия
 
