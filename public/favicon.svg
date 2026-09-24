@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Паспорт-чек «Готика»: кельевый шпиль, рамка, окно-триколор -->
+  <rect width="100" height="100" rx="22" fill="#121915"/>
+  <path d="M50 12.9 L62.1 25.8 V75 a2 2 0 0 1 -2 2 H39.9 a2 2 0 0 1 -2 -2 V25.8 Z" fill="#f2e8d2"/>
+  <path d="M50 17.2 L59 26.9 V73.4 H41 V26.9 Z" fill="none" stroke="#c9b98e" stroke-width="0.45"/>
+  <path d="M50 15.2 L60.5 26.6" stroke="#e5c179" stroke-width="0.6"/>
+  <path d="M50 15.2 L39.5 26.6" stroke="#e5c179" stroke-width="0.6"/>
+  <rect x="44.1" y="34.4" width="11.7" height="9" fill="#7a2e35"/>
+  <rect x="44.1" y="34.4" width="3.9" height="9" fill="#a8575c"/>
+  <rect x="51.9" y="34.4" width="3.9" height="9" fill="#c59b4e"/>
+  <line x1="41.8" y1="50.4" x2="44.1" y2="50.4" stroke="#c9b98e" stroke-width="0.32"/>
+  <line x1="55.9" y1="50.4" x2="58.2" y2="50.4" stroke="#c9b98e" stroke-width="0.32"/>
+  <rect x="44.1" y="49.8" width="11.7" height="1.02" rx="0.51" fill="#c9b98e"/>
+  <rect x="43.7" y="54" width="12.5" height="2.15" rx="0.78" fill="#6e6248"/>
+  <rect x="46.1" y="58.2" width="7.8" height="1.37" rx="0.68" fill="#a8987a"/>
+  <line x1="43.4" y1="64.5" x2="56.6" y2="64.5" stroke="#c59b4e" stroke-width="0.47" stroke-dasharray="1.17 1.17"/>
+  <circle cx="50" cy="20.7" r="0.78" fill="#e5c179"/>
+</svg>

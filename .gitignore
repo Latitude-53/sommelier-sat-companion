@@ -1,0 +1,17 @@
+# dependencies
+node_modules/
+
+# build artifacts (regenerated: npm run build / npm run build:single)
+dist/
+dist-single/
+
+# local screenshots / acceptance artifacts
+shots/
+*.png.tmp
+
+# misc
+*.log
+.DS_Store
+Thumbs.db
+agent-ctx/
+worklog.md
