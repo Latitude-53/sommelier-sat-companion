@@ -7,7 +7,7 @@
 [![TypeScript strict](https://img.shields.io/badge/TS-strict-3178c6.svg)](tsconfig.json)
 [![Offline PWA](https://img.shields.io/badge/PWA-offline--first-8dc78a.svg)](#-pwa)
 
-**Demo (GitHub Pages):** `https://<your-nickname>.github.io/sommelier-sat-companion/` ·
+**Demo (GitHub Pages):** `https://latitude-53.github.io/sommelier-sat-companion/` ·
 **Single-file build:** [`docs/index.html`](docs/index.html) — download it, open it on a phone, it just works. No server, no account, no telemetry: your cellar lives in IndexedDB on your device.
 
 ---
