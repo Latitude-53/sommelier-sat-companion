@@ -311,8 +311,8 @@ ${CARD_CSS}
     <div class="pills">
       ${qualityLabel ? `<span class="pill">${esc(T(qualityLabel))}</span>` : ''}
       ${isPro && record.conclusion.score100 !== null ? `<span class="pill">${record.conclusion.score100}/100</span>` : ''}
-      ${isPro ? `<span class="pill">${esc(d.serving.temperature)}</span>` : ''}
-      ${(isPro ? d.serving.window : ownWindow) ? `<span class="pill">${esc(T('Окно питья'))}: ${esc(isPro ? d.serving.window : (ownWindow ?? ''))}</span>` : ''}
+      ${isPro ? `<span class="pill">${esc(T(d.serving.temperature))}</span>` : ''}
+      ${(isPro ? d.serving.window : ownWindow) ? `<span class="pill">${esc(T('Окно питья'))}: ${esc(isPro ? T(d.serving.window) : (ownWindow ?? ''))}</span>` : ''}
     </div>
   </div>
 

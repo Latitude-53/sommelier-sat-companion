@@ -79,7 +79,7 @@ export function buildMarkdownCard(record: TastingRecord, d: Digest): string {
   const win = d.conclusion.find(([k]) => k === 'Окно питья')?.[1];
   if (win && win !== '—') lines.push(`⏳ ${T('Пить')}: ${win}`);
   /* v19: советник подачи — Pro-поверхность; в WSET-проходе строки нет. */
-  if (record.mode === 'sommelier-pro') lines.push(`🌡 ${T('Подача')}: ${d.serving.temperature}`);
+  if (record.mode === 'sommelier-pro') lines.push(`🌡 ${T('Подача')}: ${T(d.serving.temperature)}`);
   const gastro = d.media.find(([k]) => k === 'Гастрономия')?.[1];
   if (gastro) lines.push(`🍽 ${gastro}`);
 

@@ -160,9 +160,9 @@ export function PrintableTastingSheet({
           <div className="p-pills">
             {qualityLabel && <span className="p-pill">{T(qualityLabel)}</span>}
             {isPro && record.conclusion.score100 !== null && <span className="p-pill">{record.conclusion.score100}/100</span>}
-            {isPro && <span className="p-pill">{d.serving.temperature}</span>}
+            {isPro && <span className="p-pill">{T(d.serving.temperature)}</span>}
             {(isPro ? d.serving.window : ownWindow) && (
-              <span className="p-pill">{T('Окно питья')}: {isPro ? d.serving.window : ownWindow}</span>
+              <span className="p-pill">{T('Окно питья')}: {isPro ? T(d.serving.window) : ownWindow}</span>
             )}
           </div>
         </div>
