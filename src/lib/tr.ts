@@ -1245,6 +1245,8 @@ Object.assign(EN_MAP, {
   'Закрыть': 'Close',
   'Пояснение': 'Explanation',
   'Не удалось обработать фото': 'Failed to process the photo',
+  'Это не изображение': 'Not an image file',
+  'Файл слишком большой: лимит 30 МБ': 'The file is too large: the limit is 30 MB',
   'Сжимаю…': 'Compressing…',
   'неизвестная ошибка': 'unknown error',
   'Анатомия аромата: как работает математика колеса': 'Aroma anatomy: how the wheel’s maths works',

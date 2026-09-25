@@ -28,6 +28,16 @@ export function PhotoDrop({
 
   const handleFile = useCallback(
     async (file: File) => {
+      /* v22 hardening: тип и размер проверяются ДО компрессии — гигантский
+       * файл не должен даже заходить в decode/canvas (память, DoS себе же). */
+      if (!file.type.startsWith('image/')) {
+        setError(T('Это не изображение'));
+        return;
+      }
+      if (file.size > 30 * 1024 * 1024) {
+        setError(T('Файл слишком большой: лимит 30 МБ'));
+        return;
+      }
       setBusy(true);
       setError(null);
       try {

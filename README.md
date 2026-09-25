@@ -85,6 +85,17 @@ npm run icons        # regenerate PWA icons (dependency-free PNG rasterizer)
 
 **GitHub Pages:** Settings → Pages → *Deploy from a branch* → `main` → `/docs`. Update: `npm run build:single && cp dist-single/index.html docs/index.html`.
 
+## Security (fortified)
+
+The app is fully offline by design, and the browser is now forced to agree:
+
+- **CSP lockdown** — `default-src 'self'`, no external hosts, `object-src 'none'`, `base-uri 'none'`, `form-action 'none'`, `frame-src 'none'`. Nothing to load, nowhere to phone home.
+- **Exported files are sandboxed too** — every standalone HTML report ships with its own CSP (`default-src 'none'`: inline styles + data-images only) and **contains zero scripts**.
+- **Data-boundary sanitisation** — records restored from backups/IndexedDB pass through a normaliser: photo `src` accepts only whitelisted `data:image/*` base64, HEX colors are regex-whitelisted before entering SVG attributes, numeric fields are coerced.
+- **Escaped string assembly** — HTML exports build through a strict escape helper (`& < > " '`), photo data-URLs validated against a strict format whitelist (SVG deliberately excluded — it can carry scripts).
+- **Upload guards** — photos are checked for MIME type and size (30 MB cap) before decoding.
+- **`npm audit`: 0 vulnerabilities** (prod + dev). No telemetry, no analytics, no network requests — there is nothing to breach.
+
 ## Roadmap
 
 - 🕵️ **Blind Tasting Deduction Engine** — probabilistic varietal matching via vector cosine similarity (in research)

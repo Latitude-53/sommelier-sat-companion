@@ -673,6 +673,27 @@ export const WINE_PRESETS: WinePreset[] = [
   },
 ];
 
+/** v22: применение пресета в EN-режиме. Title/desc модалка переводит через T(),
+ *  но поля identity вобьются в свободные инпуты, где живёт сырой state —
+ *  T() на значениях инпутов не работает. Поэтому пресет локализуется
+ *  В МОМЕНТ ПРИМЕНЕНИЯ: region/country/grapes (+ title/desc) проходят через
+ *  tr(). В RU-режиме tr() возвращает строки как есть — поведение не меняется. */
+export function localizePreset(p: WinePreset): WinePreset {
+  const lang = getTrLang();
+  const l = (s: string): string => tr(lang, s);
+  return {
+    ...p,
+    title: l(p.title),
+    desc: l(p.desc),
+    identity: {
+      ...p.identity,
+      region: p.identity.region !== undefined ? l(p.identity.region) : undefined,
+      country: p.identity.country !== undefined ? l(p.identity.country) : undefined,
+      grapes: p.identity.grapes !== undefined ? l(p.identity.grapes) : undefined,
+    },
+  };
+}
+
 /* ── Колесо ароматов: канонический атлас WSET Level 3 ────────────────────────
  * 8 благородных семейств (первичные → вторичные → терруар → время) + отдельный
  * сектор пороков (включается тумблером). Каждый идентификатор — стабильный slug,

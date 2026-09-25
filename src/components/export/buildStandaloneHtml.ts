@@ -17,8 +17,18 @@ import { PHOTO_ROLE_LABELS, QUALITY_OPTS } from '@/lib/catalog';
 import { TYPE_WORDS, STYLE_TRIO, IDLE_TRIO, f1, ruDate, typeOf, type StyleTrio } from '@/lib/passport';
 import type { CardThemeId } from '@/lib/exportTheme';
 
+/* v22 hardening: + одинарная кавычка — полное закрытие атрибутного контекста
+ * (все интерполяции в двойных кавычках, но защита не полагается на дисциплину). */
 function esc(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+/* v22 hardening: HEX-цвет валидируется белым списком до попадания в SVG-атрибут.
+ * Ядро/кайма летят в fill="..." без esc — злая запись из бэкапа (тот же
+ * threat-model, что и у фото-белого списка M4) не должна вырваться из атрибута. */
+const HEX_RE = /^#[0-9a-fA-F]{3,8}$/;
+function safeHex(v: unknown, fallback: string): string {
+  return typeof v === 'string' && HEX_RE.test(v) ? v : fallback;
 }
 
 /* M4 (аудит v12): фото попадают в экспорт только в строгом формате
@@ -56,8 +66,8 @@ function sensoryBarsHtml(allAxes: ProfileAxis[]): string {
 
 function discSvg(record: TastingRecord, size = 34): string {
   const style: StyleTrio = record.identity.style ? STYLE_TRIO[record.identity.style] ?? IDLE_TRIO : IDLE_TRIO;
-  const core = record.eye.coreHex ?? style.trio[1] ?? '#7a2e35';
-  const rim = record.eye.rimHex ?? style.trio[0] ?? core;
+  const core = safeHex(record.eye.coreHex, style.trio[1] ?? '#7a2e35');
+  const rim = safeHex(record.eye.rimHex, style.trio[0] ?? core);
   return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="50" cy="50" r="47" fill="${rim}"/>
     <circle cx="50" cy="50" r="38" fill="${core}"/>
@@ -67,8 +77,8 @@ function discSvg(record: TastingRecord, size = 34): string {
 
 function discSvgBig(record: TastingRecord, size = 110): string {
   const style: StyleTrio = record.identity.style ? STYLE_TRIO[record.identity.style] ?? IDLE_TRIO : IDLE_TRIO;
-  const core = record.eye.coreHex ?? style.trio[1] ?? '#4a3b3b';
-  const rim = record.eye.rimHex ?? style.trio[0] ?? core;
+  const core = safeHex(record.eye.coreHex, style.trio[1] ?? '#4a3b3b');
+  const rim = safeHex(record.eye.rimHex, style.trio[0] ?? core);
   return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
     <circle cx="50" cy="50" r="47" fill="${rim}"/>
     <circle cx="50" cy="50" r="38" fill="${core}"/>
@@ -192,9 +202,14 @@ const CARD_CSS = `
 
 export function buildStandaloneHtml(record: TastingRecord, d: Digest, theme: CardThemeId, recordNumber: number | null): string {
   const isPro = record.mode === 'sommelier-pro';
+  /* v22 hardening: числа окна приводятся явно — из бэкапа/IDB может прилететь
+   * произвольная строка (TS-типы не защищают рантайм). */
+  const winFrom = Number(record.conclusion.windowFrom);
+  const winTo = Number(record.conclusion.windowTo);
   const ownWindow =
     record.conclusion.windowFrom !== null && record.conclusion.windowTo !== null
-      ? `${record.conclusion.windowFrom}–${record.conclusion.windowTo}`
+      && Number.isFinite(winFrom) && Number.isFinite(winTo)
+      ? `${Math.round(winFrom)}–${Math.round(winTo)}`
       : null;
 
   const validPhotos = record.photos
@@ -225,6 +240,8 @@ export function buildStandaloneHtml(record: TastingRecord, d: Digest, theme: Car
 <html lang="${getTrLang()}">
 <head>
 <meta charset="utf-8"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"/>
+<meta name="referrer" content="no-referrer"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>${esc(d.title)} — ${esc(T('Дегустационная карта'))}</title>
 <style>
@@ -310,7 +327,8 @@ ${CARD_CSS}
     ${table(d.conclusion)}
     <div class="pills">
       ${qualityLabel ? `<span class="pill">${esc(T(qualityLabel))}</span>` : ''}
-      ${isPro && record.conclusion.score100 !== null ? `<span class="pill">${record.conclusion.score100}/100</span>` : ''}
+      ${isPro && record.conclusion.score100 !== null && Number.isFinite(Number(record.conclusion.score100))
+        ? `<span class="pill">${Math.round(Number(record.conclusion.score100))}/100</span>` : ''}
       ${isPro ? `<span class="pill">${esc(T(d.serving.temperature))}</span>` : ''}
       ${(isPro ? d.serving.window : ownWindow) ? `<span class="pill">${esc(T('Окно питья'))}: ${esc(isPro ? T(d.serving.window) : (ownWindow ?? ''))}</span>` : ''}
     </div>

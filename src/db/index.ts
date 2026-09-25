@@ -5,7 +5,7 @@
  * в 5–10 МБ больше не угрожает данным.
  */
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb';
-import { TASTING_SCHEMA_VERSION, createEmptyTasting, type CustomAroma, type TastingRecord } from '@/types/tasting';
+import { TASTING_SCHEMA_VERSION, createEmptyTasting, type CustomAroma, type PhotoAttachment, type TastingRecord } from '@/types/tasting';
 import type { TastingMode } from '@/types/wset';
 
 interface SommelierDB extends DBSchema {
@@ -339,6 +339,45 @@ function validateBackup(json: unknown): BackupPayload {
 /** Мягкая нормализация записи (защита от старых/ручных правок JSON).
  *  Миграция v1/v2 → v3: style 'sparkling'/'fortified'/'sweet' разложены
  *  на цвет-основу + флаги sparkling/fortified; сладость теперь шкала в «Рту». */
+/* ── v22 hardening: защита на границе данных (бэкап/IDB → рантайм) ─────────
+ * TS-типы не защищают рантайм: из восстановленного бэкапа может прилететь
+ * произвольная форма. Санитизируем поля, которые уходят в строковый
+ * HTML-экспорт (hex → SVG-атрибуты, окно/балл → числовые пилюли, фото → src). */
+const HEX_COLOR_RE = /^#[0-9a-fA-F]{3,8}$/;
+const finiteOrNull = (v: unknown): number | null =>
+  typeof v === 'number' && Number.isFinite(v) ? v : null;
+
+function sanitizeEye(eye: TastingRecord['eye'] | undefined): TastingRecord['eye'] {
+  const base = eye ?? createEmptyTasting().eye;
+  return {
+    ...base,
+    coreHex: typeof base.coreHex === 'string' && HEX_COLOR_RE.test(base.coreHex) ? base.coreHex : null,
+    rimHex: typeof base.rimHex === 'string' && HEX_COLOR_RE.test(base.rimHex) ? base.rimHex : null,
+  };
+}
+
+function sanitizeConclusion(c: TastingRecord['conclusion'] | undefined): TastingRecord['conclusion'] {
+  const base = c ?? createEmptyTasting().conclusion;
+  return {
+    ...base,
+    windowFrom: finiteOrNull(base.windowFrom),
+    windowTo: finiteOrNull(base.windowTo),
+    score100: finiteOrNull(base.score100),
+  };
+}
+
+/** Фото выживают только в строгой форме: строковый id + data:image/-dataUrl. */
+function sanitizePhotos(photos: unknown): PhotoAttachment[] {
+  if (!Array.isArray(photos)) return [];
+  return photos.filter(
+    (p): p is PhotoAttachment =>
+      typeof p === 'object' && p !== null
+      && typeof (p as PhotoAttachment).id === 'string'
+      && typeof (p as PhotoAttachment).dataUrl === 'string'
+      && (p as PhotoAttachment).dataUrl.startsWith('data:image/'),
+  );
+}
+
 function normalizeRecord(r: TastingRecord): TastingRecord {
   const safeStr = (v: unknown, fallback = ''): string => (typeof v === 'string' ? v : fallback);
   /** Легаси-поля ручных ползунков не должны утекать в новые записи. */
@@ -391,7 +430,7 @@ function normalizeRecord(r: TastingRecord): TastingRecord {
       dateTasted: safeStr(r.identity?.dateTasted, new Date().toISOString().slice(0, 10)),
       taster: safeStr(r.identity?.taster),
     },
-    eye: { ...r.eye },
+    eye: sanitizeEye(r.eye),
     nose: {
       ...stripLegacyNoseFields(r.nose),
       aromas: r.nose?.aromas ?? {},
@@ -406,13 +445,13 @@ function normalizeRecord(r: TastingRecord): TastingRecord {
         note: safeStr(r.palate?.balance?.note),
       },
     },
-    conclusion: { ...r.conclusion },
+    conclusion: sanitizeConclusion(r.conclusion),
     media: {
       image: safeStr(r.media?.image),
       emojis: Array.isArray(r.media?.emojis) ? r.media.emojis : [],
       gastronomy: Array.isArray(r.media?.gastronomy) ? r.media.gastronomy : [],
       notes: safeStr(r.media?.notes),
     },
-    photos: Array.isArray(r.photos) ? r.photos : [],
+    photos: sanitizePhotos(r.photos),
   };
 }

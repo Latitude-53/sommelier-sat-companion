@@ -13,6 +13,7 @@ import { ExportModal } from '@/components/export/ExportModal';
 import { CellarLibraryModal } from '@/components/export/CellarLibraryModal';
 import { PrintableTastingSheet } from '@/components/export/PrintableTastingSheet';
 import { buildDigest } from '@/components/export/digest';
+import { localizePreset } from '@/lib/catalog';
 import { ToastProvider, useToast } from '@/components/common/Toast';
 import { ErrorBoundary } from '@/components/common/ErrorBoundary';
 import { TastingProvider, useTasting } from '@/state/TastingProvider';
@@ -193,7 +194,10 @@ function AppShell() {
               record={record}
               onPatchIdentity={(patch) => dispatch({ type: 'patch-identity', patch })}
               onApplyPreset={(preset) => {
-                dispatch({ type: 'apply-preset', preset });
+                /* v22: пресет локализуется ДО входа в state — поля identity
+                 * (регион/страна/сорта) вобьются в инпуты на языке интерфейса,
+                 * а не сырым русским. В RU-режиме — тождественно. */
+                dispatch({ type: 'apply-preset', preset: localizePreset(preset) });
                 toast(T(`Пресет «${preset.title}» применён — поправьте под ваше вино`), 'info');
               }}
               onAddPhoto={handleAddPhoto}
