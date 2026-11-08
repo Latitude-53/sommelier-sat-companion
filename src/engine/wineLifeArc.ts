@@ -98,15 +98,16 @@ const LIFESPAN_MAX = 60;
 const LIFESPAN_MIN_LIGHT = 1.5;
 const LIFESPAN_MIN_STRUCT = 2.0;
 
-/** Базовые баллы вердиктов WSET (Parker-подобная шкала) — когда численный
- * балл не выставлен, двойная оценка отталкивается от вердикта BLIC. */
+/** Базовые баллы вердиктов WSET (канон Паркера v23: медианы коридоров
+ *  50–59 / 60–69 / 70–79 / 80–89 / 90–95 / 96–100) — когда численный
+ *  балл не выставлен, двойная оценка отталкивается от вердикта BLIC. */
 export const QUALITY_BASE_SCORE: Record<QualityLevel, number> = {
-  faulty: 50,
-  poor: 62,
-  acceptable: 76,
-  good: 87,
-  'very-good': 91,
-  outstanding: 96,
+  faulty: 55,
+  poor: 65,
+  acceptable: 74,
+  good: 85,
+  'very-good': 92,
+  outstanding: 98,
 };
 
 export function currentYearOf(): number {

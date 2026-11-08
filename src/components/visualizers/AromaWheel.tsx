@@ -32,8 +32,9 @@ const R_BASE = 122;
 const GAP_DEG = 1.6;
 const START_AT = -90; // шов кольца на 12 часах
 
-/** Лимит активных дескрипторов колеса (включая свои теги). */
-export const MAX_DESCRIPTORS = 10;
+/* v23: жёсткий лимит дескрипторов снят — математика (Ципф с геометрическим
+ * хвостом + мягкий потолок P_F) сходится при любом N. Остался только
+ * гигиенический лимит СВОИХ тегов на одно семейство. */
 /** Лимит своих тегов в одном семействе. */
 export const MAX_CUSTOM_PER_FAMILY = 10;
 
@@ -399,11 +400,7 @@ export function AromaWheel({
 
   const toggleAroma = (famKey: string, id: string): void => {
     const cur = selection[id] ?? 0;
-    /* Лимит 10: новый дескриптор не добавится, пока не снят лишний. */
-    if (cur === 0 && Object.keys(selection).length >= MAX_DESCRIPTORS) {
-      flashLimit();
-      return;
-    }
+    /* v23: потолка нет — цикл уровней без ограничений. */
     const next = (cur + 1) % 4;
     const updated: AromaSelection = { ...selection };
     if (next === 0) delete updated[id];
@@ -479,11 +476,7 @@ export function AromaWheel({
     if (!activeFamily) return;
     const attached = customTags.some((t) => t.id === tag.id);
     if (!attached) {
-      /* Лимит 10: новый дескриптор не добавится, пока не снят лишний. */
-      if (Object.keys(selection).length >= MAX_DESCRIPTORS) {
-        flashLimit();
-        return;
-      }
+      /* v23: потолка нет — библиотечный тег прикрепляется свободно. */
       onUseLibraryTag(tag);
       setPulse((p) => ({ key: activeFamily.key, seq: p.seq + 1 }));
       vibrate([8, 30, 8]);
@@ -763,7 +756,7 @@ export function AromaWheel({
               role="status"
               className="px-3 py-1.5 rounded-lg border border-garnet/50 bg-garnet/10 text-[11px] font-semibold text-[#f0a49b] text-center"
             >
-              {T(`Лимит: не больше ${MAX_DESCRIPTORS} активных дескрипторов — снимите лишний, чтобы добавить новый`)}
+              {T('Лимит: не больше 10 своих дескрипторов в одном семействе — снимите лишний')}
             </p>
           )}
         </div>

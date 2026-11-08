@@ -101,8 +101,9 @@ function enforceFaultConsequences(r: TastingRecord): TastingRecord {
   const readiness = c.readiness === 'too-young' || c.readiness === 'drink-or-age' ? 'drink-now' : c.readiness;
   const windowFrom = c.windowFrom !== null ? Math.min(c.windowFrom, year) : year;
   const windowTo = c.windowTo !== null ? Math.min(c.windowTo, year) : year;
-  /* Оценка зажата на «Acceptable»: 100-балльная шкала (Pro) не выше 83. */
-  const score100 = c.score100 !== null ? Math.min(c.score100, 83) : null;
+  /* Оценка зажата на потолок нового коридора «Приемлемое» (канон Паркера
+   * v23: 70–79): 100-балльная шкала (Pro) в режиме дефекта не выше 79. */
+  const score100 = c.score100 !== null ? Math.min(c.score100, 79) : null;
   return {
     ...r,
     nose: r.nose.condition === 'unclean' ? r.nose : { ...r.nose, condition: 'unclean' },

@@ -201,6 +201,8 @@ export const EN_MAP: Record<string, string> = {
   'Тап по сектору — панель дескрипторов': 'Tap a sector — the descriptor panel',
   'Сбросить всё ×': 'Reset all ×',
   'Лимит: не больше': 'Limit: no more than',
+  'Лимит: не больше 10 своих дескрипторов в одном семействе — снимите лишний':
+    'Limit: no more than 10 custom descriptors per family — remove one',
   'активных дескрипторов — снимите лишний, чтобы добавить новый':
     'active descriptors — remove one to add a new one',
   '→ статус «С дефектом»': '→ “Faulty” status',
@@ -346,8 +348,8 @@ export const EN_MAP: Record<string, string> = {
   'Стилистический дефект 2–3 •': 'A stylistic fault 2–3 •',
   '→ вердикт принудительно «Faulty», готовность — «Пить сейчас», окно питья зажато текущим годом.':
     '→ the verdict is forced to “Faulty”, readiness — “Drink now”, the drinking window is clamped to the current year.',
-  ' Балл 100-балльной шкалы следует коридору вердикта (дефектное: 50–69).':
-    ' The 100-point score follows the verdict corridor (faulty: 50–69).',
+  ' Балл 100-балльной шкалы следует коридору вердикта (дефектное: 50–59).':
+    ' The 100-point score follows the verdict corridor (faulty: 50–59).',
   'BLIC заполнен по данным дегустации': 'BLIC filled from the tasting data',
   'Сначала заполните все 4 компонента BLIC': 'Fill in all 4 BLIC components first',
   Предложено: 'Suggested',
@@ -500,12 +502,24 @@ Object.assign(EN_MAP, {
   'Хорошее': 'Good',
   'Очень хорошее': 'Very good',
   'Выдающееся': 'Outstanding',
-  'Дефектное (50–69)': 'Faulty (50–69)',
-  'Слабое (70–79)': 'Poor (70–79)',
-  'Приемлемое (80–84)': 'Acceptable (80–84)',
-  'Хорошее (85–89)': 'Good (85–89)',
-  'Очень хорошее (90–94)': 'Very good (90–94)',
-  'Выдающееся (95–100)': 'Outstanding (95–100)',
+  'Дефектное (50–59)': 'Faulty (50–59)',
+  'Слабое (60–69)': 'Poor (60–69)',
+  'Приемлемое (70–79)': 'Acceptable (70–79)',
+  'Хорошее (80–89)': 'Good (80–89)',
+  'Очень хорошее (90–95)': 'Very good (90–95)',
+  'Выдающееся (96–100)': 'Outstanding (96–100)',
+  /* v23: канон Паркера — подсказка под ползунком (robertparker.com) */
+  'Паркер 50–59: неприемлемое вино': 'Parker 50–59: unacceptable',
+  'Паркер 60–69: ниже среднего — заметные дефициты (кислотность/танин, пустота, грязные тона)':
+    'Parker 60–69: below average — noticeable deficiencies (harsh acidity/tannin, absence of flavour, dirty aromas)',
+  'Паркер 70–79: среднее, добротно сделанное — без отличий, простое и безобидное':
+    'Parker 70–79: average, soundly made — little distinction, straightforward and innocuous',
+  'Паркер 80–89: выше среднего до очень хорошего — разная степень тонкости и характера, без заметных дефектов':
+    'Parker 80–89: barely above average to very good — various degrees of finesse and character, no noticeable flaws',
+  'Паркер 90–95: выдающееся — исключительная сложность и характер; коротко: terrific':
+    'Parker 90–95: outstanding — exceptional complexity and character; in short, terrific',
+  'Паркер 96–100: экстраординарное — глубокое и сложное, все атрибуты классики сорта; стоит особых усилий, чтобы найти':
+    'Parker 96–100: extraordinary of profound and complex character — the classic benchmark of its variety; worth a special effort to find',
   'Слишком молодое': 'Too young',
   'Пить можно, но не пик': 'Drinkable, not at peak',
   'Пить сейчас': 'Drink now',
@@ -1245,8 +1259,6 @@ Object.assign(EN_MAP, {
   'Закрыть': 'Close',
   'Пояснение': 'Explanation',
   'Не удалось обработать фото': 'Failed to process the photo',
-  'Это не изображение': 'Not an image file',
-  'Файл слишком большой: лимит 30 МБ': 'The file is too large: the limit is 30 MB',
   'Сжимаю…': 'Compressing…',
   'неизвестная ошибка': 'unknown error',
   'Анатомия аромата: как работает математика колеса': 'Aroma anatomy: how the wheel’s maths works',
@@ -1606,9 +1618,7 @@ export const EN_PATTERNS: ReadonlyArray<[RegExp, PatternTo]> = [
   [/^Гипотеза по составу колеса: (.+) до глотка\. Сверьте в разделе «Рот»\.$/, (m) =>
     `A hypothesis from the wheel composition: ${T(m[1] ?? '')} before the sip. Verify it in the “Palate” section.`],
   [/^Неподдерживаемая версия схемы: (\d+)\. Ожидается ≤ (\d+)\.$/, 'An unsupported schema version: $1. Expected ≤ $2.'],
-  /* v12: лимит колеса */
-  [/^Лимит: не больше (\d+) активных дескрипторов — снимите лишний, чтобы добавить новый$/,
-    'Limit: no more than $1 active descriptors — remove one to add a new one'],
+  /* v12: лимит колеса снят в v23 — остался лимит своих тегов (ключ в EN_MAP) */
 
   /* ═══ Паспорт v18 · призрак и хронограф ═══ */
   [/^✓ «(.+)» — запомню, буду подсказывать$/, '✓ “$1” — I’ll remember and suggest it'],

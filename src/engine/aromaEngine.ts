@@ -137,10 +137,12 @@ export function intensityMultiplierOf(intensity: SatIntensity | null | undefined
 }
 
 /**
- * Сенсорная сила семейства P_F (ТЗ v3 §2.1) — независимая шкала 0–10 без
- * штрафа за сложность: якорь по максимальной ноте + логарифмическое
- * насыщение Вебера–Фехнера за разнообразие × модуляция интенсивностью.
- * P_F = min(10, round₁((A(w_max) + 1.18·ln(1 + 0.82·Σ_rest)) · M)).
+ * Сенсорная сила семейства P_F (ТЗ v3 §2.1, v23) — независимая шкала без
+ * жёсткого потолка: якорь по максимальной ноте + логарифмическое насыщение
+ * Вебера–Фехнера за разнообразие × модуляция интенсивностью.
+ * P_F = round₁(softCap10((A(w_max) + 1.18·ln(1 + 0.82·Σ_rest)) · M)),
+ * где softCap10 — C¹-гладкий мягкий потолок (см. ниже): якоря 3.4/5.6/7.6
+ * сохраняются точно, а 10 — асимптота, а не срез.
  */
 export function sensoryPowerOf(levels: number[], intensity: SatIntensity | null | undefined): number {
   if (levels.length === 0) return 0;
@@ -149,7 +151,17 @@ export function sensoryPowerOf(levels: number[], intensity: SatIntensity | null 
   const sumRest = levels.reduce((s, l) => s + l, 0) - wMax;
   const diversity = 1.18 * Math.log(1 + 0.82 * Math.max(0, sumRest));
   const modulated = (anchor + diversity) * intensityMultiplierOf(intensity);
-  return Math.min(10, Math.round(modulated * 10) / 10);
+  return Math.round(softCap10(modulated) * 10) / 10;
+}
+
+/**
+ * Мягкий потолок шкалы (v23): до 9 — тождество, выше — 9 + tanh(x − 9).
+ * Монотонно, C¹-гладко (наклон в колене = sech²(0) = 1 — без излома),
+ * якоря психофизической шкалы не трогает; 10 — асимптота: ни один
+ * букет не «упирается в потолок», но шкала остаётся честной 0–10.
+ */
+export function softCap10(x: number): number {
+  return x <= 9 ? x : 9 + Math.tanh(x - 9);
 }
 
 /** Плотные/уваренные фруктовые дескрипторы (ТЗ v3 §2.2, Dense/Tertiary). */
@@ -219,12 +231,16 @@ export function complexityFromEntropy(k: number, hNorm: number): ComplexityVerdi
 
 /* ── Чистые формулы (используются и колесом) ───────────────────────────────── */
 
-/** Закон Ципфа: уровни сортируются по убыванию, вклад хвоста гаснет (0.5 → 0.25 → 0.1). */
+/** Закон Ципфа: уровни сортируются по убыванию, вклад хвоста гаснет
+ *  геометрически (1 → 0.5 → 0.25 → 0.1 → 0.04 → 0.016…, отношение 0.4).
+ *  Ряд 1–4 сохраняет поведение v22; дальше — затухание, поэтому raw-оценка
+ *  семейства ограничена (≤ 3·(1.75 + 0.1/0.6) ≈ 5.75) при любом числе
+ *  дескрипторов — потолок снят, математика сходится. */
 export function zipfRawScore(levels: number[]): number {
   const sorted = [...levels].sort((a, b) => b - a);
   let sum = 0;
   for (let i = 0; i < sorted.length; i++) {
-    const w = i === 0 ? 1 : i === 1 ? 0.5 : i === 2 ? 0.25 : 0.1;
+    const w = i === 0 ? 1 : i === 1 ? 0.5 : i === 2 ? 0.25 : 0.1 * Math.pow(0.4, i - 3);
     sum += (sorted[i] ?? 0) * w;
   }
   return sum;

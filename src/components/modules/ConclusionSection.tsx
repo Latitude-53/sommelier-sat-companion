@@ -7,7 +7,7 @@ import { Badge } from '@/components/common/Badge';
 import { ChipGroup, ScaleRow } from '@/components/common/Chip';
 import { SectionCard } from '@/components/common/SectionCard';
 import { Tooltip } from '@/components/common/Tooltip';
-import { suggestBlic, suggestQuality, faultAnalysisOf, WSET_TO_100_RANGES } from '@/engine/structuralProfile';
+import { suggestBlic, suggestQuality, faultAnalysisOf, WSET_TO_100_RANGES, PARKER_BAND_HINTS } from '@/engine/structuralProfile';
 import { computeStructuralProfile } from '@/engine/structuralProfile';
 import { useTasting } from '@/state/TastingProvider';
 import { useToast } from '@/components/common/Toast';
@@ -165,7 +165,7 @@ export function ConclusionSection({ record }: { record: TastingRecord }) {
               ? T('Фатальный порок (винификация/хранение убили вино)')
               : T('Стилистический дефект 2–3 •')}
             {' '}{T('→ вердикт принудительно «Faulty», готовность — «Пить сейчас», окно питья зажато текущим годом.')}
-            {isPro ? T(' Балл 100-балльной шкалы следует коридору вердикта (дефектное: 50–69).') : ''}
+            {isPro ? T(' Балл 100-балльной шкалы следует коридору вердикта (дефектное: 50–59).') : ''}
           </p>
         </div>
       )}
@@ -237,6 +237,12 @@ export function ConclusionSection({ record }: { record: TastingRecord }) {
                   </span>
                   <span>{T('Медиана')}: {currentRange.def}</span>
                 </p>
+                {/* v23: канон Паркера — формулировка текущего диапазона (robertparker.com) */}
+                {c.quality && (
+                  <p className="text-[10px] text-ink-faint/90 border-t border-hairline/60 pt-1.5 mt-1">
+                    {T(PARKER_BAND_HINTS[c.quality])}
+                  </p>
+                )}
               </div>
             );
           })()}
